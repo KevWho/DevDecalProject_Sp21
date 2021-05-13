@@ -1,0 +1,35 @@
+1. Web3 is used to get the user's accounts and create the Javascript contract object from the json interface created in the previous tasks.
+
+2. `buyLoot()`: On a high level, the function purchases the token with properties stored in `this.state.buying`. Going line-by-line:
+
+```ev.preventDefault();```
+This line prevents the `form` element in the DOM from performing its default action on submission.
+
+```this.setState({ loading: true });```
+Changing this state variable re-renders the page and changes the "BUY IT!" button to say "BUYING..." instead.
+
+```
+contract.methods.buyToken(this.state.buying.id).send(
+  { from: accounts[0], value: this.state.buying.price }
+)
+```
+Calls the `MerchToken` contract's `buyToken()` method with the user's currently-selected token id. Sends the amount defined by the token's price from the user's account.
+
+```.then(() => this.fetchLoot())```
+Refreshes the list of tokens, as the purchased token will have its `forSale` property changed.
+
+```
+.then(() => {
+  this.setState({ buying: null });
+},
+```
+On completion, reset the `buying` state variable to re-render the page and hide the purchase form.
+
+```
+(err) => {
+  console.error(err);
+  alert('Creating the token faile!');
+  this.setState({ buying: null });
+})
+```
+If the method fails for some reason (token does not exist, not for sale, etc.), notifies the user and, as in the success case, reset the `buying` state variable and re-render the page.

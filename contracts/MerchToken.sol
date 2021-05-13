@@ -64,12 +64,12 @@ contract MerchToken is ERC721, Ownable {
 
         // ***********TO DO:*************  Generate psedorandom numbers
         // by running blocktimestamp+address -> blackbox hashing function -> determine from last digit of result
-        bytes32 hash1 = 
-        bytes32 hash2 = 
+        bytes32 hash1 = sha256(abi.encode(block.timestamp + uint256(msg.sender)));
+        bytes32 hash2 = keccak256(abi.encode(hash1));
         uint256 result = uint256(hash2);
 
-        uint256 _merchType = 
-        uint256 _tag = 
+        uint256 _merchType = result % 10;
+        uint256 _tag = result % 5;
 
         require(_tag <= 4, "Failed random check, ID too large");
         require(_merchType <= 9, "Failed random check, tagID too large");
@@ -87,7 +87,7 @@ contract MerchToken is ERC721, Ownable {
         });
 
         //*****TO:DO****** once a token is minted, tell the contract by changing one variable
-        
+        index += 1;
 
         emit MerchToken(msg.sender, index);
     }
@@ -140,7 +140,10 @@ contract MerchToken is ERC721, Ownable {
     //******TO DO************
     // Changes the price that must be paid to buy a particular token
     function changePrice(uint256 _tokenId, uint256 _newPrice) public {
-
+        require(_newPrice > 0, "New price must be greater than 0");
+        require(_tokenId < index, "Token does not exist");
+        require(ownerOf(_tokenId) == msg.sender, "You do not own this token");
+        tokenInfos[_tokenId].price = _newPrice;
     }
 
     // Allow a token to be sold
